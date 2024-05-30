@@ -25,27 +25,78 @@ public class AddProduct {
 	static ResultSet rs;
 	public static void main(String[] args) {
 		AddProduct ap = new AddProduct();
-		//ap.addProduct();
-		ap.displayProducts();
+		ap.welcomeAdmin();
 	}
 
+	public void welcomeAdmin() {
+		int choice = 0;
+		Scanner scan = new Scanner(System.in);
+		while(choice != 9) {
+			System.out.println("**********************************************");
+			System.out.println("Welcome Admin");
+			System.out.println("Please select a task to perform:");
+			System.out.println("1. View All Products List");
+			System.out.println("2. Add New Product");
+			System.out.println("3. Refill Existing Product");
+			System.out.println("Enter 9 to EXIT");
+			System.out.print("Enter Choice: ");
+			choice = scan.nextInt();
+			System.out.println("**********************************************");
+			switch(choice) {
+				case 1: displayAllProducts();
+						break;
+				case 2: addProduct();
+						break;
+				case 3: updateQuantity();
+						break;
+				default: break;
+			}
+		}
+		
+	}
 	public Connection dbConnect() {
 		try {
 			Class.forName(DRIVERNAME);
 			con = DriverManager.getConnection(DBNAME, USERNAME, PASSWORD);
-			System.out.println("Connecttion Successful");
 		}
 		catch(Exception ex) {
 			ex.printStackTrace();
 		}
 		return con;
 	}
-	public void displayProducts() {
+	public void displayAllProducts() {
 		try {
 			Connection con = dbConnect();
 			query = "SELECT p.product_id, p.product_name, p.product_price, pq.quantity FROM product_master p INNER JOIN product_quantity pq ON p.product_id = pq.product_id;";
+			pStmt = con.prepareStatement(query);
+			rs = pStmt.executeQuery();
+			List<Product> productList = new ArrayList<Product>();
+			while (rs.next()) {
+				Product product = new Product();
+				product.setProdId(rs.getInt(1));
+				product.setProdName(rs.getString(2));
+				product.setProdPrice(rs.getFloat(3));
+				product.setProductQuantity(rs.getInt(4));
+				productList.add(product);
+			}
+			for(Product i : productList ) {
+				System.out.println("Product ID\tProduct Name\tProduct Price\tProduct Quantity");
+				System.out.print(i.getProdId() + "\t\t" + i.getProdName() + "\t\t" + i.getProdPrice()+ "\t\t" + i.getProductQuantity());
+				System.out.println();
+			}
+			pStmt.close();
+			con.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	public void displaySingleProducts(int prodId) {
+		try {
+			Connection con = dbConnect();
+			query = "SELECT p.product_id, p.product_name, p.product_price, pq.quantity FROM product_master p INNER JOIN product_quantity pq ON p.product_id = pq.product_id and p.product_id = ?;";
 			System.out.println(query);
 			pStmt = con.prepareStatement(query);
+			pStmt.setInt(1, prodId);
 			rs = pStmt.executeQuery();
 			List<Product> productList = new ArrayList<Product>();
 			while (rs.next()) {
@@ -89,7 +140,7 @@ public class AddProduct {
 			prodId = getProductIdInfo();
 			addQuantity(prodId);
 			System.out.println(i + " Record Saved in Product Table.");
-			displayProducts();
+			displayAllProducts();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -123,6 +174,38 @@ public class AddProduct {
 			pStmt.setInt(1, prodId);
 			pStmt.setInt(2, prodQuantity);
 			int i = pStmt.executeUpdate();
+			System.out.println(i + " Records Updated.");
+			displaySingleProducts(prodId);
+		}
+		catch(SQLException ex) {
+			ex.printStackTrace();
+		}
+	}
+	public void updateQuantity() {
+		int prodId;
+		int prodQuantity;
+		Scanner scan = new Scanner(System.in);
+		displayAllProducts();
+		System.out.print("Enter Product ID to refill stock:");
+		prodId = scan.nextInt();
+		System.out.print("Enter the New Quantity of product:");
+		prodQuantity = scan.nextInt();
+		try {
+			
+			Connection con = dbConnect();
+			query = "update product_quantity set quantity = quantity + ? where product_id = ?;";
+			
+			pStmt = con.prepareStatement(query);
+			pStmt.setInt(2, prodId);
+			pStmt.setInt(1, prodQuantity);
+
+			int i = pStmt.executeUpdate();
+
+			System.out.println("Excuted successfully " + i);
+			displaySingleProducts(prodId);
+			
+			pStmt.close();
+			con.close();
 		}
 		catch(SQLException ex) {
 			ex.printStackTrace();
