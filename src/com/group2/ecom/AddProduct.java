@@ -25,7 +25,14 @@ public class AddProduct {
 	static ResultSet rs;
 	public static void main(String[] args) {
 		AddProduct ap = new AddProduct();
-		ap.welcomeAdmin();
+		CheckPrive check = new CheckPrive();
+		check.authenticateUser();
+		if(check.accessNumber == 1) {
+			ap.welcomeAdmin();
+		}
+		else {
+			System.out.println("You are not admin");
+		}
 	}
 
 	public void welcomeAdmin() {
