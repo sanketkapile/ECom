@@ -5,32 +5,22 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Scanner;
 
-public class CheckPrive {
-	static Connection con;
-	static String query;
-	static PreparedStatement pStmt;
-	static ResultSet rs;
+public class CheckPrive extends DatabaseConnection{
 	public static String useRight;
 	public static int accessNumber;
 	public static int userId;
-	//public static void main(String[] args) {
-	//	CheckPrive check = new CheckPrive();
-	//	check.authenticateUser();
-	//	System.out.println("Right: "+useRight);
-	//	System.out.println(accessNumber);
-	//}
+
 	public void authenticateUser() {
 		String userName;
 		String password;
 		Scanner scan = new Scanner(System.in);
-		AddProduct ap = new AddProduct();
 		System.out.print("Enter Username:");
 		userName = scan.next();
 		System.out.print("Enter Passowrd:");
 		password = scan.next();
 		query = "select user_right from user_master where user_name = ? and password = ? ;";
 		try {
-			con = ap.dbConnect();
+			dbConnect();
 			pStmt = con.prepareStatement(query);
 			pStmt.setString(1, userName);
             pStmt.setString(2, password);
@@ -44,6 +34,8 @@ public class CheckPrive {
             		accessNumber = 2;
             	}
             }
+            pStmt.close();
+			con.close();
 		}
 		catch (Exception ex) {
 			ex.printStackTrace();
@@ -53,14 +45,13 @@ public class CheckPrive {
 		String username;
 		String password;
 		Scanner scan = new Scanner(System.in);
-		AddProduct ap = new AddProduct();
 		System.out.print("Enter Username:");
 		username = scan.next();
 		System.out.print("Enter Passowrd:");
 		password = scan.next();
 		query = "select user_id from user_master where user_name = ? and password = ? ;";
 		try {
-			con = ap.dbConnect();
+			dbConnect();
 			pStmt = con.prepareStatement(query);
 			pStmt.setString(1, username);
             pStmt.setString(2, password);
@@ -68,6 +59,8 @@ public class CheckPrive {
             if(rs.next()) {
             	userId = rs.getInt(1);
             }
+            pStmt.close();
+			con.close();
 		}
 		catch (Exception ex) {
 			ex.printStackTrace();

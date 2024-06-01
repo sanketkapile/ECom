@@ -8,7 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class BillGenerate {
+public class BillGenerate extends DatabaseConnection{
 
 	private static Integer billNo = 0; 
 	private static double totalBillAmount = 0;
@@ -18,17 +18,13 @@ public class BillGenerate {
 	}
 	public void billGenerate(int userId) {
 		System.out.println("Entering billing section");
-		AddProduct addProduct = new AddProduct();
-		String query;
-		PreparedStatement pStmt;
-		ResultSet rs;
 		int prodId;
 		int prodQuantity;
 		String prodName;
 		float totalPrice;
 		int purchaseId;
 		try {
-			Connection con = addProduct.dbConnect();
+			dbConnect();
 			query = "select purchase_id,product_id, product_name, purchase_quantity, product_price from purchase_history where user_id = ? and date = ? and bill_status <> 'Done';";
 			pStmt = con.prepareStatement(query);
 			pStmt.setInt(1, userId);
@@ -48,8 +44,9 @@ public class BillGenerate {
 				else {
 					flag = true;
 				}
-				
 			}
+			pStmt.close();
+			con.close();
 		}
 		catch(SQLException ex) {
 			ex.printStackTrace();
@@ -66,31 +63,27 @@ public class BillGenerate {
 		}
 	}
 	public void flagBill(int id){
-		AddProduct addProduct = new AddProduct();
-		String query;
-		PreparedStatement pStmt;
 		try {
-			Connection con = addProduct.dbConnect();
+			dbConnect();
 			query = "update purchase_history set bill_status = 'Done' where product_id = ?;";
 			pStmt = con.prepareStatement(query);
 			pStmt.setInt(1, id);
 			int i = pStmt.executeUpdate();
+			pStmt.close();
+			con.close();
 		}
 		catch(SQLException ex) {
 			ex.printStackTrace();
 		}
 	}
 	public void calculate(int prodId, int prodQuantity) {
-		AddProduct addProduct = new AddProduct();
-		
-		Connection con = addProduct.dbConnect();
-		String query;
-		PreparedStatement pStmt;
-		ResultSet rs;
+		dbConnect();
 		query = "select price from product_master where product_id = ?";
 		try {
 			pStmt = con.prepareStatement(query);
 			rs = pStmt.executeQuery();
+			pStmt.close();
+			con.close();
 		}
 		catch(SQLException ex) {
 			ex.printStackTrace();

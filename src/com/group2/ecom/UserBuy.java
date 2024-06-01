@@ -1,35 +1,27 @@
 package com.group2.ecom;
 
-import java.sql.Connection;
 import java.sql.Date;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Scanner;
 
 
-public class UserBuy {
+public class UserBuy extends DatabaseConnection{
 	public static int userId;
-	static Connection con;
-	static String query;
-	static PreparedStatement pStmt;
-	AddProduct product = new AddProduct();
-	
-	CheckPrive check = new CheckPrive();
 	Scanner scan = new Scanner(System.in);
 	static LocalDate currentDate;
 	static Date todayDate;
 	public static void main(String[] args) {
-
 		UserBuy buy = new UserBuy();
-		AddProduct addProduct = new AddProduct();
+		ProductOperations product = new ProductOperations();
 		buy.addToCart();
-		addProduct.displayAllProducts();
-
+		product.displayAllProducts();
 	}
 	public void addToCart() {
+		CheckPrive check = new CheckPrive();
 		BillGenerate bill = new BillGenerate();
+		ProductOperations product = new ProductOperations();
 		int choice = 0;
 		int prodId = 0;
 		int prodQuantity = 0;
@@ -45,13 +37,15 @@ public class UserBuy {
 			System.out.print("Enter Quantity: ");
 			prodQuantity = scan.nextInt();
 			try {
-				Connection con = product.dbConnect();
+				dbConnect();
 				query = "INSERT INTO user_cart (user_id, product_id, quantity)" + " values (?,?,?);";
 				pStmt = con.prepareStatement(query);
 				pStmt.setInt(1, check.userId);
 				pStmt.setInt(2, prodId);
 				pStmt.setInt(3, prodQuantity);
 				int i = pStmt.executeUpdate();
+				pStmt.close();
+				con.close();
 			}
 			catch(SQLException ex) {
 				ex.printStackTrace();
@@ -73,7 +67,7 @@ public class UserBuy {
 		float productPrice = 0;
 		String productName = null;
 		try {
-			Connection con = product.dbConnect();
+			dbConnect();
 			query = "SELECT uc.user_id, uc.product_id, uc.quantity, pm.product_name, pm.product_price FROM user_cart uc INNER JOIN product_master pm ON uc.product_id = pm.product_id;";
 			pStmt = con.prepareStatement(query);
 			ResultSet rs = pStmt.executeQuery();
@@ -84,9 +78,10 @@ public class UserBuy {
 				productName = rs.getString(4);
 				productPrice=rs.getFloat(5);
 				float totalPrice = productQuantityInfo * productPrice;
-				
 				addPurchaseHistory(userIdInfo,productIdInfo,productQuantityInfo,totalPrice,productName);
 			}
+			pStmt.close();
+			con.close();
 		}
 		catch(SQLException ex) {
 			ex.printStackTrace();
@@ -94,7 +89,7 @@ public class UserBuy {
 	}
 	public void addPurchaseHistory(int userIdInfo, int productIdInfo, int productQuantityInfo, float productPrice, String productName) {
 		try {
-			Connection con = product.dbConnect();
+			dbConnect();
 			query = "INSERT INTO purchase_history (user_id, product_id, product_name, purchase_quantity, product_price, date, bill_status)" + " values (?,?,?,?,?,?,?);";
 			pStmt = con.prepareStatement(query);
 			pStmt.setInt(1, userIdInfo);
@@ -107,6 +102,8 @@ public class UserBuy {
 			int i = pStmt.executeUpdate();
 			updateQuantity(productIdInfo,productQuantityInfo);
 			System.out.println(i + " Record Saved in Product Table.");
+			pStmt.close();
+			con.close();
 		}
 		catch(SQLException ex) {
 			ex.printStackTrace();
@@ -114,13 +111,15 @@ public class UserBuy {
 	}
 	public void updateQuantity(int productIdInfo, int productQuantityInfo) {
 		try {
-			Connection con = product.dbConnect();
+			dbConnect();
 			query = "update product_quantity set quantity = quantity - ? where product_id = ?;";
 			pStmt = con.prepareStatement(query);
 			pStmt.setInt(1, productQuantityInfo);
 			pStmt.setInt(2, productIdInfo);
 			int i = pStmt.executeUpdate();
 			System.out.println("Excuted successfully " + i);
+			pStmt.close();
+			con.close();
 		}
 		catch(SQLException ex) {
 			ex.printStackTrace();
@@ -128,11 +127,13 @@ public class UserBuy {
 	}
 	public void clearCart() {
 		try {
-			Connection con = product.dbConnect();
+			dbConnect();
 			query = "TRUNCATE TABLE user_cart;";
 			pStmt = con.prepareStatement(query);
 			pStmt.executeUpdate();
 			System.out.println("Cart Cleared");
+			pStmt.close();
+			con.close();
 		}
 		catch(SQLException ex) {
 			ex.printStackTrace();

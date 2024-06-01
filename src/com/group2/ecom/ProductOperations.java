@@ -1,30 +1,13 @@
 package com.group2.ecom;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+public class ProductOperations extends DatabaseConnection{
 
-
-public class AddProduct {
-
-	private static final String DBTYPE = "jdbc:mysql";
-	private static final String DATABASENAME = "ECOM";
-	private static final String HOSTADDRESS = "://localhost:3306/";
-	private static final String DRIVERNAME = "com.mysql.cj.jdbc.Driver";
-	private static final String DBNAME = DBTYPE + HOSTADDRESS + DATABASENAME;
-	private static final String USERNAME = "root";
-	private static final String PASSWORD = "root";
-	static Connection con;
-	static String query;
-	static PreparedStatement pStmt;
-	static ResultSet rs;
 	public static void main(String[] args) {
-		AddProduct ap = new AddProduct();
+		ProductOperations ap = new ProductOperations();
 		CheckPrive check = new CheckPrive();
 		check.authenticateUser();
 		if(check.accessNumber == 1) {
@@ -61,19 +44,9 @@ public class AddProduct {
 		}
 		
 	}
-	public Connection dbConnect() {
-		try {
-			Class.forName(DRIVERNAME);
-			con = DriverManager.getConnection(DBNAME, USERNAME, PASSWORD);
-		}
-		catch(Exception ex) {
-			ex.printStackTrace();
-		}
-		return con;
-	}
 	public void displayAllProducts() {
 		try {
-			Connection con = dbConnect();
+			dbConnect();
 			query = "SELECT p.product_id, p.product_name, p.product_price, pq.quantity FROM product_master p INNER JOIN product_quantity pq ON p.product_id = pq.product_id;";
 			pStmt = con.prepareStatement(query);
 			rs = pStmt.executeQuery();
@@ -99,7 +72,7 @@ public class AddProduct {
 	}
 	public void displaySingleProducts(int prodId) {
 		try {
-			Connection con = dbConnect();
+			dbConnect();
 			query = "SELECT p.product_id, p.product_name, p.product_price, pq.quantity FROM product_master p INNER JOIN product_quantity pq ON p.product_id = pq.product_id and p.product_id = ?;";
 			System.out.println(query);
 			pStmt = con.prepareStatement(query);
@@ -137,7 +110,7 @@ public class AddProduct {
 		System.out.print("Enter Product Price: ");
 		prodPrice = scan.nextFloat();
 		try {
-			Connection con = dbConnect();
+			dbConnect();
 			query = "INSERT INTO product_master (Product_Name, Product_Price)" + " values (?,?);";
 			pStmt = con.prepareStatement(query);
 			pStmt.setString(1, prodName);
@@ -148,14 +121,17 @@ public class AddProduct {
 			addQuantity(prodId);
 			System.out.println(i + " Record Saved in Product Table.");
 			displayAllProducts();
+			pStmt.close();
+			con.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		
 	}
 	public int getProductIdInfo() {
 		Product product = new Product();
 		try {
-			Connection Con = dbConnect();
+			dbConnect();
 			query = "SELECT product_id from product_master;";
 			pStmt = con.prepareStatement(query);
 			rs = pStmt.executeQuery();
@@ -175,7 +151,7 @@ public class AddProduct {
 			System.out.print("Enter Product Quantity Available: ");
 			int prodQuantity = scan.nextInt();
 			System.out.println("Adding quantity for "+prodId+" for "+prodQuantity);
-			Connection con = dbConnect();
+			dbConnect();
 			query = "INSERT INTO product_quantity (product_id, quantity) " + " values (?,?);";
 			pStmt = con.prepareStatement(query);
 			pStmt.setInt(1, prodId);
@@ -199,7 +175,7 @@ public class AddProduct {
 		prodQuantity = scan.nextInt();
 		try {
 			
-			Connection con = dbConnect();
+			dbConnect();
 			query = "update product_quantity set quantity = quantity + ? where product_id = ?;";
 			
 			pStmt = con.prepareStatement(query);
