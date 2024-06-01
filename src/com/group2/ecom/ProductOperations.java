@@ -42,7 +42,6 @@ public class ProductOperations extends DatabaseConnection{
 				default: break;
 			}
 		}
-		
 	}
 	public void displayAllProducts() {
 		try {
