@@ -63,7 +63,7 @@ public class BillGenerate extends DatabaseConnection{
 	}
 	public void displayFinalBill() {
 		System.out.println("*********************************************************************************");
-		System.out.println("\t\t\t\t\t\t\t\tTotal Bill Amount: " + totalBillAmount);
+		System.out.println("\t\t\t\t\t\tTotal Bill Amount: " + totalBillAmount);
 		System.out.println("*********************************************************************************");
 	}
 	public void flagBill(int id){

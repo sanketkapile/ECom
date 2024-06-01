@@ -5,18 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 public class ProductOperations extends DatabaseConnection{
-
-	public static void main(String[] args) {
-		ProductOperations ap = new ProductOperations();
-		CheckPrive check = new CheckPrive();
-		check.authenticateUser();
-		if(check.accessNumber == 1) {
-			ap.welcomeAdmin();
-		}
-		else {
-			System.out.println("You are not admin");
-		}
-	}
 	public void welcomeAdmin() {
 		int choice = 0;
 		Scanner scan = new Scanner(System.in);

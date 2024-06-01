@@ -21,9 +21,6 @@ public class UserBuy extends DatabaseConnection{
 		int choice = 0;
 		int prodId = 0;
 		int prodQuantity = 0;
-		//check.authenticateUser2();
-		//currentDate = LocalDate.now();
-        //todayDate = Date.valueOf(currentDate);
 		while(choice != 9) {
 			product.displayProductsUserOnly();
 			System.out.println("*********************************************************************************");
@@ -33,7 +30,6 @@ public class UserBuy extends DatabaseConnection{
 			System.out.print("Enter Quantity: ");
 			prodQuantity = scan.nextInt();
 			try {
-				System.out.println("ID = = =====> "+check.userId);
 				dbConnect();
 				query = "INSERT INTO user_cart (user_id, product_id, quantity)" + " values (?,?,?);";
 				pStmt = con.prepareStatement(query);
@@ -52,9 +48,16 @@ public class UserBuy extends DatabaseConnection{
 			System.out.println("*********************************************************************************");
 		}
 		if(choice == 9) {
-			purchaseProduct();
-			clearCart();
-			bill.billGenerate(check.userId, dateTime);
+			Boolean flag = displayCart(check.userId);
+			if(flag == true) {
+				purchaseProduct();
+				clearCart();
+				bill.billGenerate(check.userId, dateTime);
+			}
+			else {
+				System.out.println("Please continue purchasing");
+				addToCart();
+			}
 		}
 	}
 	public void purchaseProduct() {
@@ -83,6 +86,36 @@ public class UserBuy extends DatabaseConnection{
 		catch(SQLException ex) {
 			ex.printStackTrace();
 		}
+	}
+	public boolean displayCart(int userId) {
+		int productIdInfo = 0;
+		int productQuantityInfo = 0;
+		boolean purchaseInfo = false;
+		try {
+			dbConnect();
+			query = "SELECT product_id, quantity FROM user_cart where user_id = ?;";
+			pStmt = con.prepareStatement(query);
+			pStmt.setInt(1, userId);
+			ResultSet rs = pStmt.executeQuery();
+			System.out.println(userId + " Cart");
+			while (rs.next()) {	
+				productIdInfo = rs.getInt(1);
+				productQuantityInfo = rs.getInt(2);
+				System.out.println("Product Name: " + productIdInfo + "\tProduct Quantity: " + productQuantityInfo);
+			}
+			System.out.println("*********************************************************************************");
+			pStmt.close();
+			con.close();
+			System.out.println("1 to Complete Purchase/0 to Continue Purchase): ");
+			int choice = scan.nextInt();
+			if(choice == 1) {
+				purchaseInfo = true;
+			}
+		}
+		catch(SQLException ex) {
+			ex.printStackTrace();
+		}
+		return purchaseInfo;
 	}
 	public void addPurchaseHistory(int userIdInfo, int productIdInfo, int productQuantityInfo, float productPrice, String productName) {
 		LocalDateTime todayDateTime = LocalDateTime.now();

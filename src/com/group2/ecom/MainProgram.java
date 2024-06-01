@@ -7,13 +7,6 @@ public class MainProgram {
 		//Login
 		main.login();
 		//bill display
-		//BillGenerate bill = new BillGenerate();
-		//bill.billGenerate(2,"2024-06-01");
-		//Login Function
-		//user Operation
-		//admin function
-		
-		
 
 	}
 	public void login() {
@@ -26,7 +19,8 @@ public class MainProgram {
 		}
 		else {
 			//accessNumber is 2 so its normal user add other user duntions here
-			System.out.println("You are User and accessNumber is " + check.accessNumber);
+			System.out.println("You have Access to Purchase Product");
+			System.out.println("Welcome User");
 			UserBuy buy = new UserBuy();
 			buy.addToCart();
 		}
