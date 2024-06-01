@@ -7,7 +7,7 @@ import java.util.Scanner;
 public class ProductOperations extends DatabaseConnection{
 
 	public static void main(String[] args) {
-		AddProduct ap = new AddProduct();
+		ProductOperations ap = new ProductOperations();
 		CheckPrive check = new CheckPrive();
 		check.authenticateUser();
 		if(check.accessNumber == 1) {
