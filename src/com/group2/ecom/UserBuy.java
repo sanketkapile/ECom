@@ -15,6 +15,7 @@ public class UserBuy {
 	static String query;
 	static PreparedStatement pStmt;
 	AddProduct product = new AddProduct();
+	
 	CheckPrive check = new CheckPrive();
 	Scanner scan = new Scanner(System.in);
 	static LocalDate currentDate;
@@ -28,6 +29,7 @@ public class UserBuy {
 
 	}
 	public void addToCart() {
+		BillGenerate bill = new BillGenerate();
 		int choice = 0;
 		int prodId = 0;
 		int prodQuantity = 0;
@@ -61,6 +63,7 @@ public class UserBuy {
 		if(choice == 9) {
 			purchaseProduct();
 			clearCart();
+			bill.billGenerate(check.userId);
 		}
 	}
 	public void purchaseProduct() {
@@ -68,35 +71,39 @@ public class UserBuy {
 		int productIdInfo = 0;
 		int productQuantityInfo = 0;
 		float productPrice = 0;
+		String productName = null;
 		try {
 			Connection con = product.dbConnect();
-			query = "SELECT uc.user_id, uc.product_id, uc.quantity, pm.product_price FROM user_cart uc INNER JOIN product_master pm ON uc.product_id = pm.product_id;";
+			query = "SELECT uc.user_id, uc.product_id, uc.quantity, pm.product_name, pm.product_price FROM user_cart uc INNER JOIN product_master pm ON uc.product_id = pm.product_id;";
 			pStmt = con.prepareStatement(query);
 			ResultSet rs = pStmt.executeQuery();
 			while (rs.next()) {
 				userIdInfo=rs.getInt(1);
 				productIdInfo=rs.getInt(2);
 				productQuantityInfo=rs.getInt(3);
-				productPrice=rs.getFloat(4);
+				productName = rs.getString(4);
+				productPrice=rs.getFloat(5);
 				float totalPrice = productQuantityInfo * productPrice;
 				
-				addPurchaseHistory(userIdInfo,productIdInfo,productQuantityInfo,totalPrice);
+				addPurchaseHistory(userIdInfo,productIdInfo,productQuantityInfo,totalPrice,productName);
 			}
 		}
 		catch(SQLException ex) {
 			ex.printStackTrace();
 		}
 	}
-	public void addPurchaseHistory(int userIdInfo, int productIdInfo, int productQuantityInfo, float productPrice) {
+	public void addPurchaseHistory(int userIdInfo, int productIdInfo, int productQuantityInfo, float productPrice, String productName) {
 		try {
 			Connection con = product.dbConnect();
-			query = "INSERT INTO purchase_history (user_id, product_id, purchase_quantity, product_price, date)" + " values (?,?,?,?,?);";
+			query = "INSERT INTO purchase_history (user_id, product_id, product_name, purchase_quantity, product_price, date, bill_status)" + " values (?,?,?,?,?,?,?);";
 			pStmt = con.prepareStatement(query);
 			pStmt.setInt(1, userIdInfo);
 			pStmt.setInt(2, productIdInfo);
-			pStmt.setInt(3, productQuantityInfo);
-			pStmt.setFloat(4, productPrice);
-			pStmt.setDate(5, todayDate);
+			pStmt.setString(3, productName);
+			pStmt.setInt(4, productQuantityInfo);
+			pStmt.setFloat(5, productPrice);
+			pStmt.setDate(6, todayDate);
+			pStmt.setString(7, "Pending");
 			int i = pStmt.executeUpdate();
 			updateQuantity(productIdInfo,productQuantityInfo);
 			System.out.println(i + " Record Saved in Product Table.");
