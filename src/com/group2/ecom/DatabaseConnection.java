@@ -17,7 +17,7 @@ public class DatabaseConnection {
 	public static String query;
 	public static PreparedStatement pStmt;
 	public static ResultSet rs;
-	public void dbConnect() {
+	public static void dbConnect() {
 		try {
 			Class.forName(DRIVERNAME);
 			con = DriverManager.getConnection(DBNAME, USERNAME, PASSWORD);
