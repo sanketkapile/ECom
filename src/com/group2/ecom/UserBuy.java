@@ -4,20 +4,16 @@ import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
 
 public class UserBuy extends DatabaseConnection{
 	public static int userId;
 	Scanner scan = new Scanner(System.in);
-	static LocalDate currentDate;
-	static Date todayDate;
-	public static void main(String[] args) {
-		UserBuy buy = new UserBuy();
-		ProductOperations product = new ProductOperations();
-		buy.addToCart();
-		product.displayAllProducts();
-	}
+	static String dateTime;
+	LocalDateTime todayDate = LocalDateTime.now();
 	public void addToCart() {
 		CheckPrive check = new CheckPrive();
 		BillGenerate bill = new BillGenerate();
@@ -25,18 +21,19 @@ public class UserBuy extends DatabaseConnection{
 		int choice = 0;
 		int prodId = 0;
 		int prodQuantity = 0;
-		check.authenticateUser2();
-		currentDate = LocalDate.now();
-        todayDate = Date.valueOf(currentDate);
+		//check.authenticateUser2();
+		//currentDate = LocalDate.now();
+        //todayDate = Date.valueOf(currentDate);
 		while(choice != 9) {
-			product.displayAllProducts();
-			System.out.println("***********************************************");
+			product.displayProductsUserOnly();
+			System.out.println("*********************************************************************************");
 			System.out.println("Product Purchase");
 			System.out.print("Enter Product code: ");
 			prodId = scan.nextInt();
 			System.out.print("Enter Quantity: ");
 			prodQuantity = scan.nextInt();
 			try {
+				System.out.println("ID = = =====> "+check.userId);
 				dbConnect();
 				query = "INSERT INTO user_cart (user_id, product_id, quantity)" + " values (?,?,?);";
 				pStmt = con.prepareStatement(query);
@@ -50,14 +47,14 @@ public class UserBuy extends DatabaseConnection{
 			catch(SQLException ex) {
 				ex.printStackTrace();
 			}
-			System.out.print("Do you still want to continue purchse: ");
+			System.out.print("Enter 9 to Exit and any other Key to Continue: ");
 			choice = scan.nextInt();
-			System.out.println("***********************************************");
+			System.out.println("*********************************************************************************");
 		}
 		if(choice == 9) {
 			purchaseProduct();
 			clearCart();
-			bill.billGenerate(check.userId);
+			bill.billGenerate(check.userId, dateTime);
 		}
 	}
 	public void purchaseProduct() {
@@ -88,17 +85,19 @@ public class UserBuy extends DatabaseConnection{
 		}
 	}
 	public void addPurchaseHistory(int userIdInfo, int productIdInfo, int productQuantityInfo, float productPrice, String productName) {
+		LocalDateTime todayDateTime = LocalDateTime.now();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH:mm");
+        dateTime = todayDateTime.format(formatter);
 		try {
 			dbConnect();
-			query = "INSERT INTO purchase_history (user_id, product_id, product_name, purchase_quantity, product_price, date, bill_status)" + " values (?,?,?,?,?,?,?);";
+			query = "INSERT INTO purchase_history (user_id, product_id, product_name, purchase_quantity, product_price, purchase_date)" + " values (?,?,?,?,?,?);";
 			pStmt = con.prepareStatement(query);
 			pStmt.setInt(1, userIdInfo);
 			pStmt.setInt(2, productIdInfo);
 			pStmt.setString(3, productName);
 			pStmt.setInt(4, productQuantityInfo);
 			pStmt.setFloat(5, productPrice);
-			pStmt.setDate(6, todayDate);
-			pStmt.setString(7, "Pending");
+			pStmt.setString(6, dateTime);
 			int i = pStmt.executeUpdate();
 			updateQuantity(productIdInfo,productQuantityInfo);
 			System.out.println(i + " Record Saved in Product Table.");

@@ -18,7 +18,7 @@ public class CheckPrive extends DatabaseConnection{
 		userName = scan.next();
 		System.out.print("Enter Passowrd:");
 		password = scan.next();
-		query = "select user_right from user_master where user_name = ? and password = ? ;";
+		query = "select user_id, user_right from user_master where user_name = ? and password = ? ;";
 		try {
 			dbConnect();
 			pStmt = con.prepareStatement(query);
@@ -26,7 +26,8 @@ public class CheckPrive extends DatabaseConnection{
             pStmt.setString(2, password);
             rs = pStmt.executeQuery();
             if(rs.next()) {
-            	useRight = rs.getString(1);
+            	userId = rs.getInt(1);
+            	useRight = rs.getString(2);
             	if(useRight.equals("admin")) {
             		accessNumber = 1;
             	}
@@ -49,7 +50,7 @@ public class CheckPrive extends DatabaseConnection{
 		username = scan.next();
 		System.out.print("Enter Passowrd:");
 		password = scan.next();
-		query = "select user_id from user_master where user_name = ? and password = ? ;";
+		query = "select user_id, user_right from user_master where user_name = ? and password = ? ;";
 		try {
 			dbConnect();
 			pStmt = con.prepareStatement(query);
@@ -58,6 +59,13 @@ public class CheckPrive extends DatabaseConnection{
             rs = pStmt.executeQuery();
             if(rs.next()) {
             	userId = rs.getInt(1);
+            	useRight = rs.getString(2);
+            	if(useRight.equals("admin")) {
+            		accessNumber = 1;
+            	}
+            	else {
+            		accessNumber = 2;
+            	}
             }
             pStmt.close();
 			con.close();

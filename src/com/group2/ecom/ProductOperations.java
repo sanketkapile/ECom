@@ -17,12 +17,11 @@ public class ProductOperations extends DatabaseConnection{
 			System.out.println("You are not admin");
 		}
 	}
-
 	public void welcomeAdmin() {
 		int choice = 0;
 		Scanner scan = new Scanner(System.in);
 		while(choice != 9) {
-			System.out.println("**********************************************");
+			System.out.println("*********************************************************************************");
 			System.out.println("Welcome Admin");
 			System.out.println("Please select a task to perform:");
 			System.out.println("1. View All Products List");
@@ -31,7 +30,7 @@ public class ProductOperations extends DatabaseConnection{
 			System.out.println("Enter 9 to EXIT");
 			System.out.print("Enter Choice: ");
 			choice = scan.nextInt();
-			System.out.println("**********************************************");
+			System.out.println("*********************************************************************************");
 			switch(choice) {
 				case 1: displayAllProducts();
 						break;
@@ -61,6 +60,31 @@ public class ProductOperations extends DatabaseConnection{
 			for(Product i : productList ) {
 				System.out.println("Product ID\tProduct Name\tProduct Price\tProduct Quantity");
 				System.out.print(i.getProdId() + "\t\t" + i.getProdName() + "\t\t" + i.getProdPrice()+ "\t\t" + i.getProductQuantity());
+				System.out.println();
+			}
+			pStmt.close();
+			con.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	public void displayProductsUserOnly() {
+		try {
+			dbConnect();
+			query = "SELECT product_id, product_name, product_price FROM product_master;";
+			pStmt = con.prepareStatement(query);
+			rs = pStmt.executeQuery();
+			List<Product> productList = new ArrayList<Product>();
+			while (rs.next()) {
+				Product product = new Product();
+				product.setProdId(rs.getInt(1));
+				product.setProdName(rs.getString(2));
+				product.setProdPrice(rs.getFloat(3));
+				productList.add(product);
+			}
+			for(Product i : productList ) {
+				System.out.println("Product ID\tProduct Name\tProduct Price");
+				System.out.print(i.getProdId() + "\t\t" + i.getProdName() + "\t\t" + i.getProdPrice());
 				System.out.println();
 			}
 			pStmt.close();
