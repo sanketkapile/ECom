@@ -6,51 +6,44 @@ import java.sql.ResultSet;
 import java.util.Scanner;
 
 public class CheckPrive extends DatabaseConnection{
-	public static String useRight;
-	public static int accessNumber;
-	public static int userId;
-
-	public void authenticateUser() {
-		String userName;
-		String password;
-		Scanner scan = new Scanner(System.in);
-		System.out.print("Enter Username:");
-		userName = scan.next();
-		System.out.print("Enter Passowrd:");
-		password = scan.next();
-		query = "select user_id, user_right from user_master where user_name = ? and password = ? ;";
-		try {
-			dbConnect();
-			pStmt = con.prepareStatement(query);
-			pStmt.setString(1, userName);
-            pStmt.setString(2, password);
-            rs = pStmt.executeQuery();
-            if(rs.next()) {
-            	userId = rs.getInt(1);
-            	useRight = rs.getString(2);
-            	if(useRight.equals("admin")) {
-            		accessNumber = 1;
-            	}
-            	else {
-            		accessNumber = 2;
-            	}
-            }
-            pStmt.close();
-			con.close();
-		}
-		catch (Exception ex) {
-			ex.printStackTrace();
-		}
+	private static String useRight;
+	private static int accessNumber;
+	private static int userId;
+	private static String userName;
+	public String getUserName() {
+		return userName;
 	}
-	public void authenticateUser2() {
+	public void setUserName(String userName) {
+		CheckPrive.userName = userName;
+	}
+	public static String getUseRight() {
+		return useRight;
+	}
+	public static void setUseRight(String useRight) {
+		CheckPrive.useRight = useRight;
+	}
+	public static int getAccessNumber() {
+		return accessNumber;
+	}
+	public static void setAccessNumber(int accessNumber) {
+		CheckPrive.accessNumber = accessNumber;
+	}
+	public static int getUserId() {
+		return userId;
+	}
+	public static void setUserId(int userId) {
+		CheckPrive.userId = userId;
+	}
+	public void authenticateUser() {
 		String username;
 		String password;
+		int no;
 		Scanner scan = new Scanner(System.in);
 		System.out.print("Enter Username:");
 		username = scan.next();
 		System.out.print("Enter Passowrd:");
 		password = scan.next();
-		query = "select user_id, user_right from user_master where user_name = ? and password = ? ;";
+		query = "select user_id, user_rights, first_name from user_master_test where username = ? and password = ? ;";
 		try {
 			dbConnect();
 			pStmt = con.prepareStatement(query);
@@ -58,13 +51,18 @@ public class CheckPrive extends DatabaseConnection{
             pStmt.setString(2, password);
             rs = pStmt.executeQuery();
             if(rs.next()) {
-            	userId = rs.getInt(1);
-            	useRight = rs.getString(2);
+            	setUserId(rs.getInt(1));
+            	setUseRight(rs.getString(2));
+            	setUserName(rs.getString(3));
             	if(useRight.equals("admin")) {
-            		accessNumber = 1;
+            		//accessNumber = 1;
+            		no = 1;
+            		setAccessNumber(no);
             	}
             	else {
-            		accessNumber = 2;
+            		//accessNumber = 2;
+            		no = 2;
+            		setAccessNumber(no);
             	}
             }
             pStmt.close();
