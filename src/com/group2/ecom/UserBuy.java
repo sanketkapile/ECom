@@ -10,7 +10,7 @@ import java.util.Scanner;
 
 
 public class UserBuy extends DatabaseConnection{
-	public static int userId;
+	static int userId = CheckPrive.getUserId();
 	Scanner scan = new Scanner(System.in);
 	static String dateTime;
 	LocalDateTime todayDate = LocalDateTime.now();
@@ -33,7 +33,7 @@ public class UserBuy extends DatabaseConnection{
 				dbConnect();
 				query = "INSERT INTO user_cart (user_id, product_id, quantity)" + " values (?,?,?);";
 				pStmt = con.prepareStatement(query);
-				pStmt.setInt(1, check.userId);
+				pStmt.setInt(1, userId);
 				pStmt.setInt(2, prodId);
 				pStmt.setInt(3, prodQuantity);
 				int i = pStmt.executeUpdate();
@@ -48,11 +48,11 @@ public class UserBuy extends DatabaseConnection{
 			System.out.println("*********************************************************************************");
 		}
 		if(choice == 9) {
-			Boolean flag = displayCart(check.userId);
+			Boolean flag = displayCart(userId);
 			if(flag == true) {
 				purchaseProduct();
 				clearCart();
-				bill.billGenerate(check.userId, dateTime);
+				bill.billGenerate(userId, dateTime);
 			}
 			else {
 				System.out.println("Please continue purchasing");
@@ -60,7 +60,7 @@ public class UserBuy extends DatabaseConnection{
 			}
 		}
 	}
-	public void purchaseProduct() {
+	private void purchaseProduct() {
 		int userIdInfo = 0;
 		int productIdInfo = 0;
 		int productQuantityInfo = 0;
@@ -68,8 +68,9 @@ public class UserBuy extends DatabaseConnection{
 		String productName = null;
 		try {
 			dbConnect();
-			query = "SELECT uc.user_id, uc.product_id, uc.quantity, pm.product_name, pm.product_price FROM user_cart uc INNER JOIN product_master pm ON uc.product_id = pm.product_id;";
+			query = "SELECT uc.user_id, uc.product_id, uc.quantity, pm.product_name, pm.product_price FROM user_cart uc INNER JOIN product_master pm ON uc.product_id = pm.product_id where user_id = ?;";
 			pStmt = con.prepareStatement(query);
+			pStmt.setInt(1, userId);
 			ResultSet rs = pStmt.executeQuery();
 			while (rs.next()) {
 				userIdInfo=rs.getInt(1);
@@ -87,7 +88,7 @@ public class UserBuy extends DatabaseConnection{
 			ex.printStackTrace();
 		}
 	}
-	public boolean displayCart(int userId) {
+	private boolean displayCart(int userId) {
 		int productIdInfo = 0;
 		int productQuantityInfo = 0;
 		boolean purchaseInfo = false;
@@ -117,7 +118,7 @@ public class UserBuy extends DatabaseConnection{
 		}
 		return purchaseInfo;
 	}
-	public void addPurchaseHistory(int userIdInfo, int productIdInfo, int productQuantityInfo, float productPrice, String productName) {
+	private void addPurchaseHistory(int userIdInfo, int productIdInfo, int productQuantityInfo, float productPrice, String productName) {
 		LocalDateTime todayDateTime = LocalDateTime.now();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH:mm");
         dateTime = todayDateTime.format(formatter);
@@ -141,7 +142,7 @@ public class UserBuy extends DatabaseConnection{
 			ex.printStackTrace();
 		}
 	}
-	public void updateQuantity(int productIdInfo, int productQuantityInfo) {
+	private void updateQuantity(int productIdInfo, int productQuantityInfo) {
 		try {
 			dbConnect();
 			query = "update product_quantity set quantity = quantity - ? where product_id = ?;";
@@ -157,7 +158,7 @@ public class UserBuy extends DatabaseConnection{
 			ex.printStackTrace();
 		}
 	}
-	public void clearCart() {
+	private void clearCart() {
 		try {
 			dbConnect();
 			query = "TRUNCATE TABLE user_cart;";

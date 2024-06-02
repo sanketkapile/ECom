@@ -13,21 +13,18 @@ public class MainProgram {
 		ProductOperations product = new ProductOperations();
 		CheckPrive check = new CheckPrive();
 		check.authenticateUser();
-		if(check.accessNumber == 1) {
+		String userName = check.getUserName();
+		int accessNumber = CheckPrive.getAccessNumber();
+		if(accessNumber == 1) {
 			// Welcome Method - Add product / Add quantity / Update Quantity
-			product.welcomeAdmin();
+			product.welcomeAdmin(userName);
 		}
 		else {
 			//accessNumber is 2 so its normal user add other user duntions here
-			System.out.println("You have Access to Purchase Product");
-			System.out.println("Welcome User");
+			System.out.println("Welcome " + userName);
+			System.out.println("You have Right to Purchase Product");
 			UserBuy buy = new UserBuy();
 			buy.addToCart();
 		}
 	}
-	public void adminLoginCheck() {
-		
-		
-	}
-
 }
