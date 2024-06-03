@@ -55,12 +55,10 @@ public class CheckPrive extends DatabaseConnection{
             	setUseRight(rs.getString(2));
             	setUserName(rs.getString(3));
             	if(useRight.equals("admin")) {
-            		//accessNumber = 1;
             		no = 1;
             		setAccessNumber(no);
             	}
             	else {
-            		//accessNumber = 2;
             		no = 2;
             		setAccessNumber(no);
             	}
