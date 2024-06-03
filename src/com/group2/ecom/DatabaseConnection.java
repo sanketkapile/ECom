@@ -7,12 +7,12 @@ import java.sql.ResultSet;
 
 public class DatabaseConnection {
 	private static final String DBTYPE = "jdbc:mysql";
-	private static final String DATABASENAME = "ECOM";
+	private static final String DATABASENAME = "user_registration";
 	private static final String HOSTADDRESS = "://localhost:3306/";
 	private static final String DRIVERNAME = "com.mysql.cj.jdbc.Driver";
 	private static final String DBNAME = DBTYPE + HOSTADDRESS + DATABASENAME;
 	private static final String USERNAME = "root";
-	private static final String PASSWORD = "root";
+	private static final String PASSWORD = "raj7262";
 	public static Connection con;
 	public static String query;
 	public static PreparedStatement pStmt;
