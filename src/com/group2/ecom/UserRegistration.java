@@ -7,14 +7,10 @@ import java.util.Scanner;
 
 public class UserRegistration extends DatabaseConnection {
 
-	//PreparedStatement pStmt;
-	//Connection con;
-
 	public static void main(String[] args) {
 		UserRegistration user = new UserRegistration();
 		user.createUse();
 }
-
 	public void createUse() {
 
 		Scanner sc = new Scanner(System.in);
@@ -40,10 +36,6 @@ public class UserRegistration extends DatabaseConnection {
 			query = "insert into user_registration.user_registration (firstName,lastName,username,password,city,mailId,mobileNumber)  value(?,?,?,?,?,?,?)";
 
 			pStmt = con.prepareStatement(query);
-
-			// connection = UserRegistration.getConnection();
-
-			// perStatment = connection.prepareStatement(mysql);
 
 			pStmt.setString(1, firstName);
 			pStmt.setString(2, lastName);
