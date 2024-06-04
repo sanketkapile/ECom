@@ -35,7 +35,6 @@ public class ProductOperations extends DatabaseConnection{
 		try {
 			dbConnect();
 			query = "SELECT product_id, product_name, product_price, product_quantity FROM product_info;";
-			//query = "SELECT p.product_id, p.product_name, p.product_price, pq.quantity FROM product_master p INNER JOIN product_quantity pq ON p.product_id = pq.product_id;";
 			pStmt = con.prepareStatement(query);
 			rs = pStmt.executeQuery();
 			List<Product> productList = new ArrayList<Product>();
@@ -62,7 +61,6 @@ public class ProductOperations extends DatabaseConnection{
 		try {
 			dbConnect();
 			query = "SELECT product_id, product_name, product_price FROM product_info;";
-			//query = "SELECT product_id, product_name, product_price FROM product_master;";
 			pStmt = con.prepareStatement(query);
 			rs = pStmt.executeQuery();
 			List<Product> productList = new ArrayList<Product>();
@@ -73,9 +71,10 @@ public class ProductOperations extends DatabaseConnection{
 				product.setProdPrice(rs.getFloat(3));
 				productList.add(product);
 			}
-			for(Product i : productList ) {
-				System.out.println("Product ID\tProduct Name\tProduct Price");
-				System.out.print(i.getProdId() + "\t\t" + i.getProdName() + "\t\t" + i.getProdPrice());
+			System.out.println("Product ID\tProduct Name\t\tProduct Price\t\tStock Status");
+			for(Product i : productList ) {	
+				String stockStatus = getQuantityInfo(i.getProdId());
+				System.out.print(i.getProdId() + "\t\t" + i.getProdName() + "\t\t" + i.getProdPrice() + "\t\t\t" + stockStatus);
 				System.out.println();
 			}
 			pStmt.close();
@@ -88,7 +87,6 @@ public class ProductOperations extends DatabaseConnection{
 		try {
 			dbConnect();
 			query = "SELECT product_id, product_name, product_price, product_quantity FROM product_info where product_id = ?;";
-			//query = "SELECT p.product_id, p.product_name, p.product_price, pq.quantity FROM product_master p INNER JOIN product_quantity pq ON p.product_id = pq.product_id and p.product_id = ?;";
 			System.out.println(query);
 			pStmt = con.prepareStatement(query);
 			pStmt.setInt(1, prodId);
@@ -139,7 +137,6 @@ public class ProductOperations extends DatabaseConnection{
 			pStmt.setInt(4, prodQuantity);
 			int i = pStmt.executeUpdate();
 			prodId = getProductIdInfo();
-			//addQuantity(prodId);
 			System.out.println(i + " Record Saved in Product Table.");
 			displayAllProducts();
 			pStmt.close();
@@ -188,19 +185,25 @@ public class ProductOperations extends DatabaseConnection{
 			ex.printStackTrace();
 		}
 	}
-	private int getQuantityInfo() {
-		int quantity=0;
+	private String getQuantityInfo(int prodId) {
+		String stockStatus = null;
 		try {
 			dbConnect();
-			query = "SELECT product_quantity from product_info;";
+			query = "SELECT product_quantity from product_info where product_id = ?;";
 			pStmt = con.prepareStatement(query);
+			pStmt.setInt(1, prodId);
 			rs = pStmt.executeQuery();
 			while (rs.next()) {
-				quantity = rs.getInt(1);
+				if(rs.getInt(1) < 1) {
+					stockStatus = "Out of Stock";
+				}
+				else {
+					stockStatus = "In Stock";
+				}
 			}
 		} catch(SQLException ex) {
 			ex.printStackTrace();
 		}
-		return quantity;
+		return stockStatus;
 	}
 }
