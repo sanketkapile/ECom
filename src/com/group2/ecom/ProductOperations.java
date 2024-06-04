@@ -16,6 +16,8 @@ public class ProductOperations extends DatabaseConnection{
 			System.out.println("1. View All Products List");
 			System.out.println("2. Add New Product");
 			System.out.println("3. Refill Existing Product");
+			System.out.println("4. View All Purchase History");
+			System.out.println("5. Delete Purchase History Table");
 			System.out.println("Enter 9 to EXIT");
 			System.out.print("Enter Choice: ");
 			choice = scan.nextInt();
@@ -26,6 +28,10 @@ public class ProductOperations extends DatabaseConnection{
 				case 2: addProduct();
 						break;
 				case 3: updateQuantity();
+						break;
+				case 4: displayPurchaseHistory();
+						break;
+				case 5: clearPurchaseHistory();
 						break;
 				default: break;
 			}
@@ -205,5 +211,56 @@ public class ProductOperations extends DatabaseConnection{
 			ex.printStackTrace();
 		}
 		return stockStatus;
+	}
+	private void displayPurchaseHistory() {
+		int purchaseId;
+		String buyerName;
+		String productName;
+		float productPrice;
+		int productQuantity;
+		String purchaseDate;
+		try {
+			dbConnect();
+			query = "SELECT ph.purchase_id,  CONCAT(um.first_name, ' ', um.last_name) AS NAME, ph.product_name , ph.product_price, ph.purchase_quantity, ph.purchase_date FROM purchase_history ph INNER JOIN user_master um ON ph.user_id = um.user_id";
+			pStmt = con.prepareStatement(query);
+			rs = pStmt.executeQuery();
+
+			while (rs.next()) {
+				purchaseId = rs.getInt(1);
+				buyerName = rs.getString(2);
+				productName = rs.getString(3);
+				productPrice = rs.getFloat(4);
+				productQuantity = rs.getInt(5);
+				purchaseDate = rs.getString(6);
+				System.out.println(purchaseId+"\t\t"+buyerName+"\t\t"+productName+"\t\t"+productPrice+"\t\t"+productQuantity+"\t\t"+purchaseDate);
+			}
+			pStmt.close();
+			con.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	private void clearPurchaseHistory() {
+		int choice = 0;
+		Scanner scan = new Scanner(System.in);
+		System.out.println("Do You wish to clear purchase history Table:");
+		System.out.println("Press 1 for Yes and 2 for No");
+		System.out.print("Your Choice");
+		choice = scan.nextInt();
+		if(choice == 1) {
+			try {
+				dbConnect();
+				query = " truncate table purchase_history";
+				pStmt = con.prepareStatement(query);
+				rs = pStmt.executeQuery();
+				pStmt.close();
+				con.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		else {
+			System.out.println("Data Deletion Cancled for Purchase History");
+		}
 	}
 }
