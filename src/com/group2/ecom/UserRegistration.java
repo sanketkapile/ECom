@@ -7,18 +7,11 @@ import java.util.Scanner;
 
 public class UserRegistration extends DatabaseConnection {
 
-	//PreparedStatement pStmt;
-	//Connection con;
-
-	public static void main(String[] args) {
-		UserRegistration user = new UserRegistration();
-		user.createUse();
-}
-
 	public void createUse() {
 
 		Scanner sc = new Scanner(System.in);
-
+		System.out.println("               Welecome           ");
+		System.out.println("-------------------------------------------------------------------");
 		System.out.println("Enter 1 for  Registration");
 		System.out.println("Enter the first name ");
 		String firstName = sc.next();
@@ -34,17 +27,13 @@ public class UserRegistration extends DatabaseConnection {
 		String mailId = sc.next();
 		System.out.println("Enter the mobile number");
 		long mobileNumber = sc.nextLong();
+		System.out.println("-------------------------------------------------------------------");
 
 		try {
 			dbConnect();
 			query = "insert into user_registration.user_registration (firstName,lastName,username,password,city,mailId,mobileNumber)  value(?,?,?,?,?,?,?)";
 
 			pStmt = con.prepareStatement(query);
-
-			// connection = UserRegistration.getConnection();
-
-			// perStatment = connection.prepareStatement(mysql);
-
 			pStmt.setString(1, firstName);
 			pStmt.setString(2, lastName);
 			pStmt.setString(3, username);
@@ -54,17 +43,16 @@ public class UserRegistration extends DatabaseConnection {
 			pStmt.setLong(7, mobileNumber);
 
 			int i = pStmt.executeUpdate();
-
-			System.out.println(i + "Row updated ");
+			System.out.println(i + "registered successfully! ");
 
 		} catch (Exception ex) {
 			System.out.println(ex.getMessage());
 
 		} finally {
 			try {
-			con.close();
-			pStmt.close();
-			}catch(Exception e) {
+				con.close();
+				pStmt.close();
+			} catch (Exception e) {
 				System.out.println(e.getMessage());
 			}
 		}

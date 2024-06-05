@@ -2,6 +2,7 @@ package com.group2.ecom;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,40 +11,49 @@ import java.util.TreeSet;
 import com.mysql.cj.xdevapi.Collection;
 
 public class ProductSorting extends UserRegistration {
-	
-	PreparedStatement pStmt;
-	Connection con;
 
-   
-	public static void main(String[] args) {
-		
+	public void Sorting() {
+		dbConnect();
 
+		query = "select * from products.products ORDER BY ProductID ASC, ProductName ASC,productDescription ASC,price ASC ";
+		try {
+			pStmt = con.prepareStatement(query);
+			ResultSet resultSet = pStmt.executeQuery();
+
+			System.out.println(
+					"-------------------------------------------------------------------------------------------------");
+			System.out.print("Product Id ");
+			System.out.print("\t Product Name  ");
+			System.out.print("\t product Description  ");
+			System.out.print("\t Product price  ");
+			System.out.println(
+					"\n-----------------------------------------------------------------------------------------------");
+			while (resultSet.next()) {
+				System.out.println(
+						"-------------------------------------------------------------------------------------------------");
+				System.out.print(resultSet.getInt("ProductID"));
+				System.out.print("\t" + resultSet.getString("ProductName"));
+				System.out.print("\t" + resultSet.getString("productDescription"));
+				System.out.print("\t" + resultSet.getString("price"));
+				System.out.println(
+						"\n-----------------------------------------------------------------------------------------------");
+			}
+			System.out.println("Data Sorted by Product ID");
+
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		} finally {
+			// Close resources
+			try {
+				if (pStmt != null) {
+					pStmt.close();
+				}
+				if (con != null) {
+					con.close();
+				}
+			} catch (SQLException ex) {
+				System.out.println(ex.getMessage());
+			}
+		}
 	}
-   public void Sorting () {
-	   
-	 ArrayList<String> list = new ArrayList<String>();
-	 list.add(query);
-	 list.add(query);	 
-	 
-	 TreeSet<String> treeset = new TreeSet<String>();
-	 
-	 
-	 dbConnect();
-	 
-	 query = "select * from user_registration where ProductID = ? and  ProductName =  ? order by asc";
-	 
-	 try {
-		pStmt = con.prepareStatement(query);
-		 int i = pStmt.executeUpdate();
-		 System.out.println(i + "Data Sorted by Product name and Product Id");
-		 
-	} catch (SQLException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
-	 
-	
-	 
-	 
-   }
 }
