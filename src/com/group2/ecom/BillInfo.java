@@ -1,9 +1,9 @@
+
 package com.group2.ecom;
 
 import java.sql.Date;
 
 public class BillInfo {
-	
 	private int productId;
 	private String productName;
 	private int purchaseQuantity;
@@ -59,5 +59,4 @@ public class BillInfo {
 	public void setPurchaseId(int purchaseId) {
 		this.purchaseId = purchaseId;
 	}
-		
 }

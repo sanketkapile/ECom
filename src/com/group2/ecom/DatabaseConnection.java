@@ -12,7 +12,7 @@ public class DatabaseConnection {
 	private static final String DRIVERNAME = "com.mysql.cj.jdbc.Driver";
 	private static final String DBNAME = DBTYPE + HOSTADDRESS + DATABASENAME;
 	private static final String USERNAME = "root";
-	private static final String PASSWORD = "root";
+	private static final String PASSWORD = "Root*123";
 	public static Connection con;
 	public static String query;
 	public static PreparedStatement pStmt;
