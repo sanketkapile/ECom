@@ -5,15 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class ProductOperations extends DatabaseConnection {
-	int id;
-	
-	public void welcomeAdmin(String username) {
+public class ProductOperations extends DatabaseConnection{
+	public void welcomeAdmin(String userName) {
 		int choice = 0;
 		Scanner scan = new Scanner(System.in);
-		while (choice != 9) {
+		while(choice != 9) {
 			System.out.println("*********************************************************************************");
-			System.out.println("Welcome " + username);
+			System.out.println("Welcome " + userName);
+      
 			System.out.println("Please select a task to perform:");
 			System.out.println("1. View All Products List");
 			System.out.println("2. Add New Product");
@@ -25,6 +24,7 @@ public class ProductOperations extends DatabaseConnection {
 			System.out.print("Enter Choice: ");
 			choice = scan.nextInt();
 			System.out.println("*********************************************************************************");
+
 			switch (choice) {
 			case 1:
 				displayAllProducts();
@@ -49,11 +49,10 @@ public class ProductOperations extends DatabaseConnection {
 			}
 		}
 	}
-
 	private void displayAllProducts() {
 		try {
 			dbConnect();
-			query = "SELECT p.product_id, p.product_name, p.product_price, pq.quantity FROM product_master p INNER JOIN product_quantity pq ON p.product_id = pq.product_id;";
+			query = "SELECT product_id, product_name, product_price, product_quantity FROM product_info;";
 			pStmt = con.prepareStatement(query);
 			rs = pStmt.executeQuery();
 			List<Product> productList = new ArrayList<Product>();
@@ -67,8 +66,7 @@ public class ProductOperations extends DatabaseConnection {
 			}
 			for (Product i : productList) {
 				System.out.println("Product ID\tProduct Name\tProduct Price\tProduct Quantity");
-				System.out.print(i.getProdId() + "\t\t" + i.getProdName() + "\t\t" + i.getProdPrice() + "\t\t"
-						+ i.getProductQuantity());
+				System.out.print(i.getProdId() + "\t\t" + i.getProdName() + "\t\t" + i.getProdPrice() + "\t\t"+ i.getProductQuantity());
 				System.out.println();
 			}
 			pStmt.close();
@@ -81,7 +79,7 @@ public class ProductOperations extends DatabaseConnection {
 	public void displayProductsUserOnly() {
 		try {
 			dbConnect();
-			query = "SELECT product_id, product_name, product_price FROM product_master;";
+			query = "SELECT product_id, product_name, product_price FROM product_info;";  
 			pStmt = con.prepareStatement(query);
 			rs = pStmt.executeQuery();
 			List<Product> productList = new ArrayList<Product>();
@@ -92,9 +90,10 @@ public class ProductOperations extends DatabaseConnection {
 				product.setProdPrice(rs.getFloat(3));
 				productList.add(product);
 			}
-			for (Product i : productList) {
-				System.out.println("Product ID\tProduct Name\tProduct Price");
-				System.out.print(i.getProdId() + "\t\t" + i.getProdName() + "\t\t" + i.getProdPrice());
+			System.out.println("Product ID\tProduct Name\t\tProduct Price\t\tStock Status");
+			for(Product i : productList ) {	
+				String stockStatus = getQuantityInfo(i.getProdId());
+				System.out.print(i.getProdId() + "\t\t" + i.getProdName() + "\t\t" + i.getProdPrice() + "\t\t\t" + stockStatus);
 				System.out.println();
 			}
 			pStmt.close();
@@ -103,11 +102,10 @@ public class ProductOperations extends DatabaseConnection {
 			e.printStackTrace();
 		}
 	}
-
 	private void displaySingleProducts(int prodId) {
 		try {
 			dbConnect();
-			query = "SELECT p.product_id, p.product_name, p.product_price, pq.quantity FROM product_master p INNER JOIN product_quantity pq ON p.product_id = pq.product_id and p.product_id = ?;";
+			query = "SELECT product_id, product_name, product_price, product_quantity FROM product_info where product_id = ?;";
 			System.out.println(query);
 			pStmt = con.prepareStatement(query);
 			pStmt.setInt(1, prodId);
@@ -123,8 +121,7 @@ public class ProductOperations extends DatabaseConnection {
 			}
 			for (Product i : productList) {
 				System.out.println("Product ID\tProduct Name\tProduct Price\tProduct Quantity");
-				System.out.print(i.getProdId() + "\t\t" + i.getProdName() + "\t\t" + i.getProdPrice() + "\t\t"
-						+ i.getProductQuantity());
+				System.out.print(i.getProdId() + "\t\t" + i.getProdName() + "\t\t" + i.getProdPrice() + "\t\t"+ i.getProductQuantity());
 				System.out.println();
 			}
 			pStmt.close();
@@ -133,27 +130,32 @@ public class ProductOperations extends DatabaseConnection {
 			e.printStackTrace();
 		}
 	}
-
 	private void addProduct() {
 		Product product = new Product();
 		int prodId = 0;
 		int prodQuantity = 0;
 		float prodPrice = 0;
 		String prodName = null;
+		String prodDesc = null;
 		Scanner scan = new Scanner(System.in);
 		System.out.print("Enter Product Name: ");
 		prodName = scan.next();
+		System.out.print("Enter Product Description: ");
+		prodDesc = scan.nextLine();
 		System.out.print("Enter Product Price: ");
 		prodPrice = scan.nextFloat();
+		System.out.print("Enter Product Quantity: ");
+		prodQuantity = scan.nextInt();
 		try {
 			dbConnect();
-			query = "INSERT INTO product_master (Product_Name, Product_Price)" + " values (?,?);";
+			query = "INSERT INTO product_info (product_name,product_description,product_price, product_quantity)" + " values (?,?,?,?);";
 			pStmt = con.prepareStatement(query);
 			pStmt.setString(1, prodName);
-			pStmt.setFloat(2, prodPrice);
+			pStmt.setString(2, prodDesc);
+			pStmt.setFloat(3, prodPrice);
+			pStmt.setInt(4, prodQuantity);
 			int i = pStmt.executeUpdate();
 			prodId = getProductIdInfo();
-			addQuantity(prodId);
 			System.out.println(i + " Record Saved in Product Table.");
 			displayAllProducts();
 			pStmt.close();
@@ -178,7 +180,6 @@ public class ProductOperations extends DatabaseConnection {
 		}
 		return product.getProdId();
 	}
-
 	private void addQuantity(int prodId) {
 		try {
 			Scanner scan = new Scanner(System.in);
@@ -197,7 +198,6 @@ public class ProductOperations extends DatabaseConnection {
 			ex.printStackTrace();
 		}
 	}
-
 	private void updateQuantity() {
 		int prodId;
 		int prodQuantity;
@@ -209,7 +209,7 @@ public class ProductOperations extends DatabaseConnection {
 		prodQuantity = scan.nextInt();
 		try {
 			dbConnect();
-			query = "update product_quantity set quantity = quantity + ? where product_id = ?;";
+			query = "update product_info set product_quantity = product_quantity + ? where product_id = ?;";
 			pStmt = con.prepareStatement(query);
 			pStmt.setInt(2, prodId);
 			pStmt.setInt(1, prodQuantity);
@@ -222,17 +222,15 @@ public class ProductOperations extends DatabaseConnection {
 			ex.printStackTrace();
 		}
 	}
-
+  
 	public void checkProductQauntity() {
 		try {
-
 			int prodId;
 			int prodQuantity;
 			Scanner scan = new Scanner(System.in);
 			displayAllProducts();
 			System.out.print("Enter Product ID to check stock :");
 			prodId = scan.nextInt();
-
 			dbConnect();
 			String sqlquery = "select quantity from product_quantity where product_id=?";
 			pStmt = con.prepareStatement(sqlquery);
@@ -245,11 +243,9 @@ public class ProductOperations extends DatabaseConnection {
 			}
 			pStmt.close();
 			con.close();
-
 		} catch (Exception e) {
 			System.out.println(e);
 		}
-
 	}
 
 	public void checkRegUser() {
@@ -273,10 +269,8 @@ public class ProductOperations extends DatabaseConnection {
 			} else {
 				System.out.println("User Dosen't Exist");
 			}
-
 			con.close();
 			pStmt.close();
-
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -328,3 +322,27 @@ public class ProductOperations extends DatabaseConnection {
 	}
 
 }
+
+	private String getQuantityInfo(int prodId) {
+		String stockStatus = null;
+		try {
+			dbConnect();
+			query = "SELECT product_quantity from product_info where product_id = ?;";
+			pStmt = con.prepareStatement(query);
+			pStmt.setInt(1, prodId);
+			rs = pStmt.executeQuery();
+			while (rs.next()) {
+				if(rs.getInt(1) < 1) {
+					stockStatus = "Out of Stock";
+				}
+				else {
+					stockStatus = "In Stock";
+				}
+			}
+		} catch(SQLException ex) {
+			ex.printStackTrace();
+		}
+		return stockStatus;
+	}
+}
+

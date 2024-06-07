@@ -18,6 +18,7 @@ public class UserBuy extends DatabaseConnection{
 		CheckPrive check = new CheckPrive();
 		BillGenerate bill = new BillGenerate();
 		ProductOperations product = new ProductOperations();
+		System.out.println("User ID: " + userId);
 		int choice = 0;
 		int prodId = 0;
 		int prodQuantity = 0;
@@ -68,16 +69,18 @@ public class UserBuy extends DatabaseConnection{
 		String productName = null;
 		try {
 			dbConnect();
-			query = "SELECT uc.user_id, uc.product_id, uc.quantity, pm.product_name, pm.product_price FROM user_cart uc INNER JOIN product_master pm ON uc.product_id = pm.product_id where user_id = ?;";
+
+			query = "SELECT uc.user_id, uc.product_id, uc.quantity, pm.product_name, pm.product_price FROM user_cart uc INNER JOIN product_info pm ON uc.product_id = pm.product_id where user_id = ?;";
+
 			pStmt = con.prepareStatement(query);
 			pStmt.setInt(1, userId);
 			ResultSet rs = pStmt.executeQuery();
 			while (rs.next()) {
-				userIdInfo=rs.getInt(1);
-				productIdInfo=rs.getInt(2);
-				productQuantityInfo=rs.getInt(3);
+				userIdInfo = rs.getInt(1);
+				productIdInfo = rs.getInt(2);
+				productQuantityInfo = rs.getInt(3);
 				productName = rs.getString(4);
-				productPrice=rs.getFloat(5);
+				productPrice = rs.getFloat(5);
 				float totalPrice = productQuantityInfo * productPrice;
 				addPurchaseHistory(userIdInfo,productIdInfo,productQuantityInfo,totalPrice,productName);
 			}
@@ -112,6 +115,8 @@ public class UserBuy extends DatabaseConnection{
 			if(choice == 1) {
 				purchaseInfo = true;
 			}
+			pStmt.close();
+			con.close();
 		}
 		catch(SQLException ex) {
 			ex.printStackTrace();
@@ -145,7 +150,7 @@ public class UserBuy extends DatabaseConnection{
 	private void updateQuantity(int productIdInfo, int productQuantityInfo) {
 		try {
 			dbConnect();
-			query = "update product_quantity set quantity = quantity - ? where product_id = ?;";
+			query = "update product_info set product_quantity = product_quantity - ? where product_id = ?;";
 			pStmt = con.prepareStatement(query);
 			pStmt.setInt(1, productQuantityInfo);
 			pStmt.setInt(2, productIdInfo);
