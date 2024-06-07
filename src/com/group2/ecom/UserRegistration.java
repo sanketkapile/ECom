@@ -29,7 +29,7 @@ public class UserRegistration extends DatabaseConnection {
 		
 		try {
 			dbConnect();
-			query = "insert into user_master_test (first_name,last_name,username,password,city,mail_id,contact_number)  value(?,?,?,?,?,?,?)";
+			query = "insert into user_master (first_name,last_name,username,password,city,mail_id,contact_number)  value(?,?,?,?,?,?,?)";
 			pStmt = con.prepareStatement(query);
 
 			pStmt.setString(1, firstName);

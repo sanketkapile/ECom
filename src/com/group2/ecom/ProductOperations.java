@@ -40,7 +40,7 @@ public class ProductOperations extends DatabaseConnection{
 	private void displayAllProducts() {
 		try {
 			dbConnect();
-			query = "SELECT product_id, product_name, product_price, product_quantity FROM product_info;";
+			query = "SELECT product_id, product_name, product_price, product_quantity FROM product_info order by product_id;";
 			pStmt = con.prepareStatement(query);
 			rs = pStmt.executeQuery();
 			List<Product> productList = new ArrayList<Product>();
@@ -66,7 +66,7 @@ public class ProductOperations extends DatabaseConnection{
 	public void displayProductsUserOnly() {
 		try {
 			dbConnect();
-			query = "SELECT product_id, product_name, product_price FROM product_info;";
+			query = "SELECT product_id, product_name, product_price, product_quantity FROM product_info order by product_id;";
 			pStmt = con.prepareStatement(query);
 			rs = pStmt.executeQuery();
 			List<Product> productList = new ArrayList<Product>();
@@ -75,7 +75,11 @@ public class ProductOperations extends DatabaseConnection{
 				product.setProdId(rs.getInt(1));
 				product.setProdName(rs.getString(2));
 				product.setProdPrice(rs.getFloat(3));
-				productList.add(product);
+				product.setProductQuantity(rs.getInt(4));
+				if(product.getProductQuantity() > 1) {
+					productList.add(product);
+				}
+				
 			}
 			System.out.println("Product ID\tProduct Name\t\tProduct Price\t\tStock Status");
 			for(Product i : productList ) {	
@@ -126,10 +130,10 @@ public class ProductOperations extends DatabaseConnection{
 		String prodDesc = null;
 		Scanner scan = new Scanner(System.in);
 		System.out.print("Enter Product Name: ");
-		prodName = scan.next();
-		System.out.print("Enter Product Description: ");
+		prodName = scan.nextLine();
+		System.out.print("\nEnter Product Description: ");
 		prodDesc = scan.nextLine();
-		System.out.print("Enter Product Price: ");
+		System.out.print("\nEnter Product Price: ");
 		prodPrice = scan.nextFloat();
 		System.out.print("Enter Product Quantity: ");
 		prodQuantity = scan.nextInt();
