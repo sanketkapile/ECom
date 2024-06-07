@@ -43,7 +43,9 @@ public class CheckPrive extends DatabaseConnection{
 		username = scan.next();
 		System.out.print("Enter Passowrd:");
 		password = scan.next();
+
 		query = "select user_id, user_rights, first_name from user_master where username = ? and password = ? ;";
+    
 		try {
 			dbConnect();
 			pStmt = con.prepareStatement(query);
@@ -71,3 +73,5 @@ public class CheckPrive extends DatabaseConnection{
 		}
 	}
 }
+}
+

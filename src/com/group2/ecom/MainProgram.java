@@ -1,3 +1,4 @@
+
 package com.group2.ecom;
 
 import java.util.Scanner;
@@ -6,6 +7,8 @@ public class MainProgram {
 
 	public static void main(String[] args) {
 		MainProgram main = new MainProgram();
+
+		//Login
 		main.loginPage();
 	}
 	public void loginPage() {
@@ -38,6 +41,7 @@ public class MainProgram {
 			}
 		}
 	}
+  
 	public void login() {
 		ProductOperations product = new ProductOperations();
 		CheckPrive check = new CheckPrive();
@@ -46,6 +50,7 @@ public class MainProgram {
 		int accessNumber = CheckPrive.getAccessNumber();
 		if(accessNumber == 1) {
 			// Welcome Method - Add product / Add quantity / Update Quantity
+			product.welcomeAdmin(userName);
 			System.out.println("***********************************************************************");
 			product.welcomeAdmin(userName);
 			System.out.println("***********************************************************************");

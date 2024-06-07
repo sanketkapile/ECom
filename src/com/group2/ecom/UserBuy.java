@@ -69,7 +69,9 @@ public class UserBuy extends DatabaseConnection{
 		String productName = null;
 		try {
 			dbConnect();
+
 			query = "SELECT uc.user_id, uc.product_id, uc.quantity, pm.product_name, pm.product_price FROM user_cart uc INNER JOIN product_info pm ON uc.product_id = pm.product_id where user_id = ?;";
+
 			pStmt = con.prepareStatement(query);
 			pStmt.setInt(1, userId);
 			ResultSet rs = pStmt.executeQuery();
@@ -103,9 +105,11 @@ public class UserBuy extends DatabaseConnection{
 			while (rs.next()) {	
 				productIdInfo = rs.getInt(1);
 				productQuantityInfo = rs.getInt(2);
-				System.out.println("Product Id: " + productIdInfo + "\t\t\tProduct Quantity: " + productQuantityInfo);
+				System.out.println("Product Name: " + productIdInfo + "\tProduct Quantity: " + productQuantityInfo);
 			}
 			System.out.println("*********************************************************************************");
+			pStmt.close();
+			con.close();
 			System.out.println("1 to Complete Purchase/0 to Continue Purchase): ");
 			int choice = scan.nextInt();
 			if(choice == 1) {
