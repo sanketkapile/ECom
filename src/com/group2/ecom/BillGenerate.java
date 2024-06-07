@@ -21,13 +21,16 @@ public class BillGenerate extends DatabaseConnection{
 		String billStatus;
 		try {
 			dbConnect();
+      
 			query = "SELECT ph.product_id, ph.product_name, pm.product_price, ph.purchase_quantity, ph.product_price, ph.bill_status, ph.purchase_id FROM purchase_history ph INNER JOIN product_info pm ON ph.product_id = pm.product_id where user_id = ? and purchase_date = ? and bill_status = 'Pending';";
 			pStmt = con.prepareStatement(query);
 			pStmt.setInt(1, userId);
 			pStmt.setString(2, todayDate);
 			rs = pStmt.executeQuery();
 			rs = pStmt.executeQuery();
+      
 			List<BillInfo> billInfoList = new ArrayList<BillInfo>();
+      
 			while (rs.next()) {
 				BillInfo billInfo = new BillInfo();
 				billInfo.setProductId(rs.getInt(1));
@@ -39,7 +42,9 @@ public class BillGenerate extends DatabaseConnection{
 				billInfo.setPurchaseId(rs.getInt(7));
 				billInfoList.add(billInfo);
 			}
+      
 			billCalculate(billInfoList, todayDate);
+      
 			pStmt.close();
 			con.close();
 		}
@@ -55,7 +60,8 @@ public class BillGenerate extends DatabaseConnection{
 		System.out.println("*********************************************************************************");
 		float finalBillAmount = 0;
 		for (BillInfo i : billInfoList) {
-			System.out.println(i.getProductId()+"\t\t"+i.getProductName()+"\t"+i.getProductPrice()+"\t\t"+i.getPurchaseQuantity()+"\t\t\t"+i.getFinalProductPrice());
+			System.out.println(i.getProductId()+"\t\t"+i.getProductName()+"\t\t"+i.getProductPrice()+"\t\t"+i.getPurchaseQuantity()+"\t\t"+i.getFinalProductPrice());
+
 			finalBillAmount = finalBillAmount + i.getFinalProductPrice();
 			flagBill(i.getPurchaseId());
 		}
@@ -77,4 +83,8 @@ public class BillGenerate extends DatabaseConnection{
 			ex.printStackTrace();
 		}
 	}
+
 }
+
+}
+

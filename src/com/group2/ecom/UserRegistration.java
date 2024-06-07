@@ -42,7 +42,7 @@ public class UserRegistration extends DatabaseConnection {
 
 			int i = pStmt.executeUpdate();
 
-			System.out.println(i + "Row updated ");
+			System.out.println(i + " ");
 			con.close();
 			pStmt.close();
 
