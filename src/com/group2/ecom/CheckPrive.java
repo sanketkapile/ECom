@@ -73,5 +73,5 @@ public class CheckPrive extends DatabaseConnection{
 		}
 	}
 }
-}
+
 

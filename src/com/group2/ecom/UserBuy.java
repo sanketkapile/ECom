@@ -81,8 +81,13 @@ public class UserBuy extends DatabaseConnection{
 				productQuantityInfo = rs.getInt(3);
 				productName = rs.getString(4);
 				productPrice = rs.getFloat(5);
-				float totalPrice = productQuantityInfo * productPrice;
-				addPurchaseHistory(userIdInfo,productIdInfo,productQuantityInfo,totalPrice,productName);
+				if(productQuantityInfo>1) {
+					float totalPrice = productQuantityInfo * productPrice;
+					addPurchaseHistory(userIdInfo,productIdInfo,productQuantityInfo,totalPrice,productName);
+				}
+				else {
+					System.out.println("Product is OUT OF STOCK");
+				}
 			}
 			pStmt.close();
 			con.close();

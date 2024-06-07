@@ -85,6 +85,3 @@ public class BillGenerate extends DatabaseConnection{
 	}
 
 }
-
-}
-
