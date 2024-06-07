@@ -12,7 +12,6 @@ public class ProductOperations extends DatabaseConnection{
 		while(choice != 9) {
 			System.out.println("*********************************************************************************");
 			System.out.println("Welcome " + userName);
-      
 			System.out.println("Please select a task to perform:");
 			System.out.println("1. View All Products List");
 			System.out.println("2. Add New Product");
@@ -45,7 +44,6 @@ public class ProductOperations extends DatabaseConnection{
 					break;
 				default:
 					break;
-
 			}
 		}
 	}
@@ -92,7 +90,6 @@ public class ProductOperations extends DatabaseConnection{
 				if(product.getProductQuantity() > 1) {
 					productList.add(product);
 				}
-				
 			}
 			System.out.println("Product ID\tProduct Name\t\tProduct Price\t\tStock Status");
 			for(Product i : productList ) {	
@@ -184,24 +181,6 @@ public class ProductOperations extends DatabaseConnection{
 		}
 		return product.getProdId();
 	}
-	private void addQuantity(int prodId) {
-		try {
-			Scanner scan = new Scanner(System.in);
-			System.out.print("Enter Product Quantity Available: ");
-			int prodQuantity = scan.nextInt();
-			System.out.println("Adding quantity for " + prodId + " for " + prodQuantity);
-			dbConnect();
-			query = "INSERT INTO product_quantity (product_id, quantity) " + " values (?,?);";
-			pStmt = con.prepareStatement(query);
-			pStmt.setInt(1, prodId);
-			pStmt.setInt(2, prodQuantity);
-			int i = pStmt.executeUpdate();
-			System.out.println(i + " Records Updated.");
-			displaySingleProducts(prodId);
-		} catch (SQLException ex) {
-			ex.printStackTrace();
-		}
-	}
 	private void updateQuantity() {
 		int prodId;
 		int prodQuantity;
@@ -227,7 +206,7 @@ public class ProductOperations extends DatabaseConnection{
 		}
 	}
   
-	public void checkProductQauntity() {
+	private void checkProductQauntity() {
 		try {
 			int prodId;
 			int prodQuantity;
@@ -251,8 +230,7 @@ public class ProductOperations extends DatabaseConnection{
 			System.out.println(e);
 		}
 	}
-
-	public void checkRegUser() {
+	private void checkRegUser() {
 		try {
 			DatabaseConnection.dbConnect();
 			Scanner sc = new Scanner(System.in);
@@ -276,56 +254,46 @@ public class ProductOperations extends DatabaseConnection{
 			con.close();
 			pStmt.close();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
 
-	public void userHistory() {
-		
+	private void userHistory() {
+		String userName;
+		int purchaseId;
+		String productName;
+		float productPrice;
+		int productQuantity;
+		String purchaseDate;
+		int userId;
 		try {
 			dbConnect();
 			Scanner sc=new Scanner(System.in);
 			System.out.println("Enter the users Name to get Purchase Histroy");
 			String username=sc.nextLine();
-			String uid="select user_id from user_registration1 where username=?";
 			
-			pStmt=con.prepareStatement(uid);
-			pStmt.setString(1,username);
+			query = "SELECT ph.purchase_id,  CONCAT(um.first_name, ' ', um.last_name) AS NAME, ph.product_name , ph.product_price, ph.purchase_quantity, ph.purchase_date, um.user_id FROM purchase_history ph INNER JOIN user_master um ON ph.user_id = um.user_id and username = ?;";
+			pStmt=con.prepareStatement(query);
+			pStmt.setString(1, username);
 			rs=pStmt.executeQuery();
-			while(rs.next()==true)
-			{
-				id=rs.getInt(1);
-			}
-			
-			String sqlquery="select purchase_date, product_id, product_name, purchase_quantity from purchase_history where user_id=?";
-			//System.out.println(id);
-			pStmt=con.prepareStatement(sqlquery);
-			pStmt.setInt(1, id);
-			
-			rs=pStmt.executeQuery();
+			System.out.println("USER ID\tUSER NAME\tPURCHASE ID\tPRODUCT NAME\tPRODUCT PRICE\tQUANTITY\tPURCHASE DATE");
 			while(rs.next())
 			{
-				String date=rs.getString(1);
-				int product_id=rs.getInt(2);
-				String product_name=rs.getString(3);
-				int quantity=rs.getInt(4);
-				
-				System.out.println( "\n"+date+"\nUser_id :"+id+"\nProduct_Id :"+product_id+"\nProduct_name :"+product_name+"\nQuantity :"+quantity);
+				purchaseId = rs.getInt(1);
+				userName = rs.getString(2);
+				productName = rs.getString(3);
+				productPrice = rs.getFloat(4);
+				productQuantity = rs.getInt(5);
+				purchaseDate = rs.getString(6);
+				userId = rs.getInt(7);
+				System.out.println(userId+"\t"+userName+"\t"+purchaseId+"\t"+productName+"\t"+productPrice+"\t"+productQuantity+"\t"+purchaseDate);
 			}
-			
 			pStmt.close();
 			con.close();
 		} catch (Exception e) {
 			System.out.println(e);
 		}
-		
-		
-
 	}
-
-}
 
 	private String getQuantityInfo(int prodId) {
 		String stockStatus = null;
@@ -347,57 +315,6 @@ public class ProductOperations extends DatabaseConnection{
 			ex.printStackTrace();
 		}
 		return stockStatus;
-	}
-	private void displayPurchaseHistory() {
-		int purchaseId;
-		String buyerName;
-		String productName;
-		float productPrice;
-		int productQuantity;
-		String purchaseDate;
-		try {
-			dbConnect();
-			query = "SELECT ph.purchase_id,  CONCAT(um.first_name, ' ', um.last_name) AS NAME, ph.product_name , ph.product_price, ph.purchase_quantity, ph.purchase_date FROM purchase_history ph INNER JOIN user_master um ON ph.user_id = um.user_id";
-			pStmt = con.prepareStatement(query);
-			rs = pStmt.executeQuery();
-
-			while (rs.next()) {
-				purchaseId = rs.getInt(1);
-				buyerName = rs.getString(2);
-				productName = rs.getString(3);
-				productPrice = rs.getFloat(4);
-				productQuantity = rs.getInt(5);
-				purchaseDate = rs.getString(6);
-				System.out.println(purchaseId+"\t\t"+buyerName+"\t\t"+productName+"\t\t"+productPrice+"\t\t"+productQuantity+"\t\t"+purchaseDate);
-			}
-			pStmt.close();
-			con.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
-	private void clearPurchaseHistory() {
-		int choice = 0;
-		Scanner scan = new Scanner(System.in);
-		System.out.println("Do You wish to clear purchase history Table:");
-		System.out.println("Press 1 for Yes and 2 for No");
-		System.out.print("Your Choice");
-		choice = scan.nextInt();
-		if(choice == 1) {
-			try {
-				dbConnect();
-				query = " truncate table purchase_history";
-				pStmt = con.prepareStatement(query);
-				rs = pStmt.executeQuery();
-				pStmt.close();
-				con.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-		else {
-			System.out.println("Data Deletion Cancled for Purchase History");
-		}
 	}
 }
 
