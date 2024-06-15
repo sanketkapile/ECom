@@ -62,6 +62,7 @@ public class UserBuy extends DatabaseConnection{
 		}
 	}
 	private void purchaseProduct() {
+		ProductOperations productOperation = new ProductOperations();
 		int userIdInfo = 0;
 		int productIdInfo = 0;
 		int productQuantityInfo = 0;
@@ -81,7 +82,8 @@ public class UserBuy extends DatabaseConnection{
 				productQuantityInfo = rs.getInt(3);
 				productName = rs.getString(4);
 				productPrice = rs.getFloat(5);
-				if(productQuantityInfo>1) {
+				String status = productOperation.getQuantityInfo(productIdInfo);
+				if(status.equals("In Stock")) {
 					float totalPrice = productQuantityInfo * productPrice;
 					addPurchaseHistory(userIdInfo,productIdInfo,productQuantityInfo,totalPrice,productName);
 				}
@@ -99,23 +101,27 @@ public class UserBuy extends DatabaseConnection{
 	private boolean displayCart(int userId) {
 		int productIdInfo = 0;
 		int productQuantityInfo = 0;
+		String productName;
+		float productPrice = 0;
 		boolean purchaseInfo = false;
 		try {
 			dbConnect();
-			query = "SELECT product_id, quantity FROM user_cart where user_id = ?;";
+			query = "SELECT pm.product_id, pm.product_name, uc.quantity, pm.product_price FROM user_cart uc INNER JOIN product_info pm ON uc.product_id = pm.product_id where user_id = ?;";
 			pStmt = con.prepareStatement(query);
 			pStmt.setInt(1, userId);
 			ResultSet rs = pStmt.executeQuery();
 			System.out.println(userId + " Cart");
 			while (rs.next()) {	
 				productIdInfo = rs.getInt(1);
-				productQuantityInfo = rs.getInt(2);
-				System.out.println("Product Name: " + productIdInfo + "\tProduct Quantity: " + productQuantityInfo);
+				productName = rs.getString(2);
+				productQuantityInfo = rs.getInt(3);
+				productPrice = rs.getFloat(4);
+				System.out.println("Product ID: " + productIdInfo + "\tProduct Name: " + productName + "\tProduct Price:" + productPrice + "\tProduct Quantity: " + productQuantityInfo);
 			}
 			System.out.println("*********************************************************************************");
 			pStmt.close();
 			con.close();
-			System.out.println("1 to Complete Purchase/0 to Continue Purchase): ");
+			System.out.print("1 to Complete Purchase/0 to Continue Purchase): ");
 			int choice = scan.nextInt();
 			if(choice == 1) {
 				purchaseInfo = true;
