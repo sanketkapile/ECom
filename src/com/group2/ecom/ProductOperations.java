@@ -62,8 +62,8 @@ public class ProductOperations extends DatabaseConnection{
 				product.setProductQuantity(rs.getInt(4));
 				productList.add(product);
 			}
+			System.out.println("Product ID\tProduct Name\tProduct Price\tProduct Quantity");
 			for (Product i : productList) {
-				System.out.println("Product ID\tProduct Name\tProduct Price\tProduct Quantity");
 				System.out.print(i.getProdId() + "\t\t" + i.getProdName() + "\t\t" + i.getProdPrice() + "\t\t"+ i.getProductQuantity());
 				System.out.println();
 			}
@@ -218,7 +218,6 @@ public class ProductOperations extends DatabaseConnection{
 			String sqlquery = "select quantity from product_quantity where product_id=?";
 			pStmt = con.prepareStatement(sqlquery);
 			pStmt.setInt(1, prodId);
-
 			rs=pStmt.executeQuery();
 			if(rs.next()==true) {
             int quantity=rs.getInt(1);
@@ -234,20 +233,22 @@ public class ProductOperations extends DatabaseConnection{
 		try {
 			DatabaseConnection.dbConnect();
 			Scanner sc = new Scanner(System.in);
-			System.out.println("Eter the user_name");
+			System.out.print("Enter the user_name");
 			String user_name = sc.nextLine();
-			String sqlquery = "select firstname, lastname, city, email, mobileno from user_registration1 where username=?";
+			System.out.println("\n");
+			String sqlquery = "select first_name, last_name, city, mail_id, contact_number from user_master where username=?";
 			pStmt = con.prepareStatement(sqlquery);
 			pStmt.setString(1, user_name);
 
 			rs = pStmt.executeQuery();
+			System.out.print("First_namet\tLast_name\tCity\tEmail\tContact No\n");
 			if (rs.next() == true) {
 				String firstname = rs.getString(1);
 				String lastname = rs.getString(2);
 				String city = rs.getString(3);
 				String email = rs.getString(4);
 				long mobileno=rs.getLong(5);
-				System.out.print("First_name :" + firstname + "\nLast_name :"+lastname+"\ncity :"+city+"\nemail :"+email+"\nmobileno :"+mobileno +"\n");
+				System.out.print(firstname + "\t"+lastname+"\t"+city+"\t"+email+"\t"+mobileno);
 			} else {
 				System.out.println("User Dosen't Exist");
 			}
@@ -272,7 +273,7 @@ public class ProductOperations extends DatabaseConnection{
 			System.out.println("Enter the users Name to get Purchase Histroy");
 			String username=sc.nextLine();
 			
-			query = "SELECT ph.purchase_id,  CONCAT(um.first_name, ' ', um.last_name) AS NAME, ph.product_name , ph.product_price, ph.purchase_quantity, ph.purchase_date, um.user_id FROM purchase_history ph INNER JOIN user_master um ON ph.user_id = um.user_id and username = ?;";
+			query = "SELECT ph.purchase_id, CONCAT(um.first_name, ' ', um.last_name) AS NAME, ph.product_name , ph.product_price, ph.purchase_quantity, ph.purchase_date, um.user_id FROM purchase_history ph INNER JOIN user_master um ON ph.user_id = um.user_id and username = ?;";
 			pStmt=con.prepareStatement(query);
 			pStmt.setString(1, username);
 			rs=pStmt.executeQuery();
@@ -286,7 +287,7 @@ public class ProductOperations extends DatabaseConnection{
 				productQuantity = rs.getInt(5);
 				purchaseDate = rs.getString(6);
 				userId = rs.getInt(7);
-				System.out.println(userId+"\t"+userName+"\t"+purchaseId+"\t"+productName+"\t"+productPrice+"\t"+productQuantity+"\t"+purchaseDate);
+				System.out.println(userId+"\t"+userName+"\t\t"+purchaseId+"\t"+productName+"\t"+productPrice+"\t"+productQuantity+"\t"+purchaseDate);
 			}
 			pStmt.close();
 			con.close();
@@ -295,7 +296,7 @@ public class ProductOperations extends DatabaseConnection{
 		}
 	}
 
-	private String getQuantityInfo(int prodId) {
+	String getQuantityInfo(int prodId) {
 		String stockStatus = null;
 		try {
 			dbConnect();
